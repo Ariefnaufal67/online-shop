@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --ink: #0e0c0a;
+  --paper: #f5f0e8;
+  --cream: #ede8dc;
+  --accent: #c8502a;
+  --accent2: #2a7c6f;
+  --muted: #7a7060;
+  --card-bg: #faf8f3;
+  --border: rgba(14,12,10,0.1);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background-color: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); }
+
+.font-display { font-family: 'Fraunces', serif; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pulse-dot { animation: pulse-dot 1.5s infinite; }
+.animate-slide-in  { animation: slide-in 0.4s ease; }
+.animate-fade-in   { animation: fade-in 0.35s ease; }
+.animate-toast     { animation: toast-up 0.35s cubic-bezier(0.16,1,0.3,1); }
+
+.bar-fill { transition: width 0.6s ease; }
