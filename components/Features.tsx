@@ -14,7 +14,7 @@ export default function Features() {
   return (
     <section className="px-10 py-20">
       <div className="text-center mb-12">
-        <h2 className="font-display font-light mb-3" style={{ fontSize: 38 }}>Fitur Nuva</h2>
+        <h2 className="font-display font-light mb-3" style={{ fontSize: 38 }}>Fitur yang belum ada di tempat lain</h2>
         <p className="text-sm" style={{ color: "var(--muted)" }}>Kami merancang ulang cara orang berbelanja fashion online</p>
       </div>
 
