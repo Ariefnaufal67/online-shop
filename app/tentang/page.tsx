@@ -1,4 +1,4 @@
-import { ToastProvider } from "@/components/Toast";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { Metadata } from "next";
@@ -31,7 +31,7 @@ const MILESTONES = [
 
 export default function TentangPage() {
   return (
-    <ToastProvider>
+    <>
       <Navbar />
       <main style={{ minHeight: "80vh" }}>
 
@@ -155,6 +155,6 @@ export default function TentangPage() {
 
       </main>
       <Footer />
-    </ToastProvider>
+    </>
   );
 }

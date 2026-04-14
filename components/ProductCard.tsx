@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Product } from "@/data/products";
+import { useCart } from "./CartContext";
 import { useToast } from "./Toast";
 
 const BG_MAP = {
@@ -12,34 +13,39 @@ const BG_MAP = {
 
 interface Props {
   product: Product;
-  onAddCart: (name: string) => void;
   onTryOn: (name: string) => void;
 }
 
-export default function ProductCard({ product, onAddCart, onTryOn }: Props) {
+export default function ProductCard({ product, onTryOn }: Props) {
   const [wishlist, setWishlist] = useState(false);
+  const { addItem, openCart } = useCart();
   const { show } = useToast();
+
+  const handleAdd = () => {
+    addItem({ name: product.name, brand: product.brand, price: product.price, emoji: product.emoji });
+    show(`🛒 ${product.name} ditambahkan ke keranjang!`);
+    openCart();
+  };
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
     setWishlist(!wishlist);
     if (!wishlist) show(`❤️ ${product.name} ditambahkan ke wishlist`);
+    else show(`💔 Dihapus dari wishlist`);
   };
 
   return (
-    <div onClick={() => onAddCart(product.name)}
+    <div onClick={handleAdd}
       className="rounded-2xl overflow-hidden cursor-pointer border transition-all duration-250 hover:-translate-y-1"
       style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
 
       {/* Image */}
       <div className="relative h-48 flex items-center justify-center" style={{ background: BG_MAP[product.bg] }}>
         <span style={{ fontSize: 52 }}>{product.emoji}</span>
-
         <div className="absolute top-3 right-3 rounded-lg px-2 py-0.5 text-[10px] font-semibold text-white"
           style={{ background: "var(--accent2)" }}>{product.score}</div>
-
-        <button onClick={(e) => { e.stopPropagation(); onTryOn(product.name); }}
-          className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-lg px-3 py-1 text-[11px] font-medium border-none cursor-pointer transition-colors"
+        <button onClick={e => { e.stopPropagation(); onTryOn(product.name); }}
+          className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-lg px-3 py-1 text-[11px] font-medium border-none cursor-pointer"
           style={{ background: "rgba(255,255,255,0.92)", color: "var(--ink)" }}>
           👗 Coba Virtual
         </button>
@@ -54,7 +60,7 @@ export default function ProductCard({ product, onAddCart, onTryOn }: Props) {
           <span className="text-sm font-medium">{product.price}</span>
           <button onClick={handleWishlist}
             className="rounded-lg px-2 py-1 text-base border transition-colors"
-            style={{ background: wishlist ? "#fde8e0" : "none", borderColor: wishlist ? "var(--accent)" : "var(--border)" }}>
+            style={{ background: wishlist ? "#fde8e0" : "none", borderColor: wishlist ? "var(--accent)" : "var(--border)", cursor: "pointer" }}>
             {wishlist ? "❤️" : "🤍"}
           </button>
         </div>

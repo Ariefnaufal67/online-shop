@@ -1,4 +1,3 @@
-import { ToastProvider } from "@/components/Toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import KoleksiClient from "./KoleksiClient";
@@ -8,10 +7,10 @@ export const metadata: Metadata = { title: "Koleksi — NuvaShop" };
 
 export default function KoleksiPage() {
   return (
-    <ToastProvider>
+    <>
       <Navbar />
       <KoleksiClient />
       <Footer />
-    </ToastProvider>
+    </>
   );
 }
