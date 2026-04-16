@@ -147,11 +147,12 @@ export default function CartDrawer() {
               </button>
             </div>
 
-            <button onClick={handleCheckout}
-              className="w-full rounded-2xl py-3.5 text-sm font-medium text-white transition-colors"
-              style={{ background: "var(--accent)", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+            <a href="/checkout"
+              className="w-full rounded-2xl py-3.5 text-sm font-medium text-white text-center block no-underline"
+              style={{ background: "var(--accent)", textDecoration: "none" }}
+              onClick={() => closeCart()}>
               Checkout — {fmt(Math.floor(totalPrice * 0.95))}
-            </button>
+            </a>
 
             <p className="text-center text-xs mt-3" style={{ color: "var(--muted)" }}>
               🔒 Pembayaran aman · Gratis return 30 hari

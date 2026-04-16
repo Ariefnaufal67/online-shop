@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
+import { AuthProvider } from "@/components/AuthContext";
+import { ReviewProvider } from "@/components/ReviewContext";
 import { ToastProvider } from "@/components/Toast";
 import CartDrawer from "@/components/CartDrawer";
 
@@ -14,10 +16,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body>
         <ToastProvider>
-          <CartProvider>
-            {children}
-            <CartDrawer />
-          </CartProvider>
+          <AuthProvider>
+            <ReviewProvider>
+              <CartProvider>
+                {children}
+                <CartDrawer />
+              </CartProvider>
+            </ReviewProvider>
+          </AuthProvider>
         </ToastProvider>
       </body>
     </html>
