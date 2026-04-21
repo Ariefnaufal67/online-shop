@@ -1,15 +1,24 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartContext";
 import { useToast } from "@/components/Toast";
 
+const SLUG_MAP: Record<string, string> = {
+  "Power Blazer Hitam": "power-blazer-hitam",
+  "Oversized Hoodie":   "oversized-hoodie",
+  "Midi Dress Floral":  "midi-dress-floral",
+  "Heels Statement":    "heels-statement",
+  "Cardigan Pastel":    "cardigan-pastel",
+};
+
 const SEASONS = [
-  { id: "new",     label: "New Arrivals",   icon: "✨", desc: "Koleksi paling baru, hadir setiap minggu" },
-  { id: "best",    label: "Best Sellers",   icon: "🔥", desc: "Produk terfavorit komunitas NuvaShop" },
-  { id: "summer",  label: "Summer Edit",    icon: "☀️", desc: "Ringan, cerah, dan nyaman di hari panas" },
-  { id: "office",  label: "Office Ready",   icon: "💼", desc: "Tampil profesional setiap hari kerja" },
-  { id: "casual",  label: "Weekend Vibes",  icon: "😌", desc: "Santai stylish untuk akhir pekan" },
-  { id: "limited", label: "Limited Edition",icon: "💎", desc: "Edisi terbatas, stok sangat terbatas!" },
+  { id: "new",     label: "New Arrivals",    icon: "✨", desc: "Koleksi paling baru, hadir setiap minggu" },
+  { id: "best",    label: "Best Sellers",    icon: "🔥", desc: "Produk terfavorit komunitas NuvaShop" },
+  { id: "summer",  label: "Summer Edit",     icon: "☀️", desc: "Ringan, cerah, dan nyaman di hari panas" },
+  { id: "office",  label: "Office Ready",    icon: "💼", desc: "Tampil profesional setiap hari kerja" },
+  { id: "casual",  label: "Weekend Vibes",   icon: "😌", desc: "Santai stylish untuk akhir pekan" },
+  { id: "limited", label: "Limited Edition", icon: "💎", desc: "Edisi terbatas, stok sangat terbatas!" },
 ];
 
 type Product = { name: string; brand: string; price: string; emoji: string; isNew?: boolean; limited?: boolean };
@@ -48,20 +57,20 @@ const COLLECTIONS: Record<string, Product[]> = {
     { name: "Midi Pencil Skirt",  brand: "Office Edit",  price: "Rp 245.000", emoji: "👗" },
   ],
   casual: [
-    { name: "Oversized Hoodie",  brand: "Soft Studio",  price: "Rp 245.000", emoji: "👕" },
-    { name: "Jogger Pants Cozy", brand: "Nuva Comfy",   price: "Rp 185.000", emoji: "👖" },
-    { name: "Topi Canvas",       brand: "Daily Wear",   price: "Rp 99.000",  emoji: "🧢" },
-    { name: "Sandal Rajut",      brand: "Kaki Bebas",   price: "Rp 129.000", emoji: "🩴" },
-    { name: "Mini Crossbody",    brand: "Arkive",       price: "Rp 165.000", emoji: "👜" },
-    { name: "Kaos Graphic Print",brand: "Street N",     price: "Rp 145.000", emoji: "👕" },
+    { name: "Oversized Hoodie",   brand: "Soft Studio",  price: "Rp 245.000", emoji: "👕" },
+    { name: "Jogger Pants Cozy",  brand: "Nuva Comfy",   price: "Rp 185.000", emoji: "👖" },
+    { name: "Topi Canvas",        brand: "Daily Wear",   price: "Rp 99.000",  emoji: "🧢" },
+    { name: "Sandal Rajut",       brand: "Kaki Bebas",   price: "Rp 129.000", emoji: "🩴" },
+    { name: "Mini Crossbody",     brand: "Arkive",       price: "Rp 165.000", emoji: "👜" },
+    { name: "Kaos Graphic Print", brand: "Street N",     price: "Rp 145.000", emoji: "👕" },
   ],
   limited: [
-    { name: "Printed Co-ord Set",   brand: "Nuva Studio",  price: "Rp 599.000", emoji: "🎨", limited: true },
-    { name: "Hand-dyed Jacket",     brand: "Arkive",       price: "Rp 789.000", emoji: "🧥", limited: true },
-    { name: "Artisan Leather Bag",  brand: "Arkive",       price: "Rp 850.000", emoji: "👜", limited: true },
-    { name: "Embroidered Dress",    brand: "Bunga Studio", price: "Rp 680.000", emoji: "👗", limited: true },
-    { name: "Crystal Earring Set",  brand: "Perhiasan N",  price: "Rp 245.000", emoji: "💎", limited: true },
-    { name: "Woven Platform Mule",  brand: "Kaki Bebas",   price: "Rp 420.000", emoji: "👠", limited: true },
+    { name: "Printed Co-ord Set",  brand: "Nuva Studio",  price: "Rp 599.000", emoji: "🎨", limited: true },
+    { name: "Hand-dyed Jacket",    brand: "Arkive",       price: "Rp 789.000", emoji: "🧥", limited: true },
+    { name: "Artisan Leather Bag", brand: "Arkive",       price: "Rp 850.000", emoji: "👜", limited: true },
+    { name: "Embroidered Dress",   brand: "Bunga Studio", price: "Rp 680.000", emoji: "👗", limited: true },
+    { name: "Crystal Earring Set", brand: "Perhiasan N",  price: "Rp 245.000", emoji: "💎", limited: true },
+    { name: "Woven Platform Mule", brand: "Kaki Bebas",   price: "Rp 420.000", emoji: "👠", limited: true },
   ],
 };
 
@@ -76,10 +85,18 @@ const BG_LIST = [
 
 function ProductTile({ p, bg, featured }: { p: Product; bg: string; featured?: boolean }) {
   const { addItem, openCart } = useCart();
-  const { show } = useToast();
-  const [added, setAdded] = useState(false);
+  const { show }              = useToast();
+  const router                = useRouter();
+  const [added, setAdded]     = useState(false);
 
-  const handleAdd = (e: React.MouseEvent) => {
+  const slug     = SLUG_MAP[p.name];
+  const hasDetail = !!slug;
+
+  const handleCardClick = () => {
+    if (hasDetail) router.push(`/produk/${slug}`);
+  };
+
+  const handleAddCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addItem({ name: p.name, brand: p.brand, price: p.price, emoji: p.emoji });
     show(`🛒 ${p.name} ditambahkan ke keranjang!`);
@@ -89,11 +106,16 @@ function ProductTile({ p, bg, featured }: { p: Product; bg: string; featured?: b
   };
 
   return (
-    <div className="rounded-2xl overflow-hidden border cursor-pointer transition-all hover:-translate-y-1 group"
-      style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}
-      onClick={handleAdd}>
+    <div
+      onClick={hasDetail ? handleCardClick : undefined}
+      className="rounded-2xl overflow-hidden border transition-all hover:-translate-y-1 group"
+      style={{
+        background: "var(--card-bg)",
+        borderColor: "var(--border)",
+        cursor: hasDetail ? "pointer" : "default",
+      }}>
 
-      {/* Image area */}
+      {/* Image */}
       <div className={`flex items-center justify-center relative ${featured ? "h-64" : "h-36"}`}
         style={{ background: bg }}>
         <span style={{ fontSize: featured ? 80 : 44 }}>{p.emoji}</span>
@@ -106,27 +128,32 @@ function ProductTile({ p, bg, featured }: { p: Product; bg: string; featured?: b
           </span>
         )}
 
-        {/* Add to cart overlay on hover */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ background: "rgba(14,12,10,0.18)" }}>
-          <span className="rounded-2xl px-4 py-2 text-xs font-medium text-white"
-            style={{ background: added ? "var(--accent2)" : "var(--accent)" }}>
-            {added ? "✓ Ditambahkan!" : "+ Keranjang"}
-          </span>
-        </div>
+        {/* Detail badge on hover */}
+        {hasDetail && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{ background: "rgba(14,12,10,0.16)" }}>
+            <span className="rounded-xl px-3 py-1.5 text-xs font-medium text-white"
+              style={{ background: "rgba(14,12,10,0.65)" }}>
+              Lihat Detail →
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Info */}
       <div className="p-4">
         <p className={`font-medium truncate ${featured ? "text-sm" : "text-xs"}`}>{p.name}</p>
         <p className="text-[10px] mt-0.5" style={{ color: "var(--muted)" }}>{p.brand}</p>
-        <div className="flex items-center justify-between mt-2">
-          <p className={`font-medium ${featured ? "text-sm" : "text-sm"}`}>{p.price}</p>
+        <div className="flex items-center justify-between mt-2 gap-1">
+          <p className="text-sm font-medium">{p.price}</p>
           <button
-            onClick={handleAdd}
-            className="rounded-xl px-3 py-1 text-xs font-medium text-white transition-colors"
-            style={{ background: added ? "var(--accent2)" : "var(--accent)", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-            {added ? "✓" : "+ Keranjang"}
+            onClick={handleAddCart}
+            className="rounded-xl px-3 py-1.5 text-xs font-medium text-white transition-colors flex-shrink-0"
+            style={{
+              background: added ? "var(--accent2)" : "var(--accent)",
+              border: "none", cursor: "pointer", fontFamily: "inherit",
+            }}>
+            {added ? "✓ Added" : "+ Keranjang"}
           </button>
         </div>
       </div>
@@ -137,7 +164,7 @@ function ProductTile({ p, bg, featured }: { p: Product; bg: string; featured?: b
 export default function KoleksiClient() {
   const [active, setActive] = useState("new");
   const products = COLLECTIONS[active] || [];
-  const season = SEASONS.find(s => s.id === active)!;
+  const season   = SEASONS.find(s => s.id === active)!;
 
   return (
     <div style={{ minHeight: "80vh" }}>
@@ -145,10 +172,12 @@ export default function KoleksiClient() {
       <div className="px-10 py-14 border-b" style={{ background: "var(--cream)", borderColor: "var(--border)" }}>
         <p className="text-xs font-medium tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>✦ Koleksi Pilihan</p>
         <h1 className="font-display font-light mb-3" style={{ fontSize: 46 }}>Koleksi NuvaShop</h1>
-        <p className="text-sm" style={{ color: "var(--muted)" }}>Dikurasi dengan cermat oleh tim stylist dan AI kami.</p>
+        <p className="text-sm" style={{ color: "var(--muted)" }}>
+          Dikurasi dengan cermat oleh tim stylist dan AI kami. Klik produk untuk melihat detail.
+        </p>
       </div>
 
-      {/* Season Tabs */}
+      {/* Tabs */}
       <div className="border-b overflow-x-auto" style={{ borderColor: "var(--border)" }}>
         <div className="flex px-10 min-w-max">
           {SEASONS.map(s => (
@@ -157,8 +186,7 @@ export default function KoleksiClient() {
               style={{
                 borderBottom: `2px solid ${active === s.id ? "var(--accent)" : "transparent"}`,
                 color: active === s.id ? "var(--ink)" : "var(--muted)",
-                background: "none",
-                cursor: "pointer", fontFamily: "inherit",
+                background: "none", cursor: "pointer", fontFamily: "inherit",
               }}>
               {s.icon} {s.label}
             </button>
@@ -168,21 +196,24 @@ export default function KoleksiClient() {
 
       {/* Content */}
       <div className="px-10 py-10">
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
           <div>
             <h2 className="font-display font-light mb-1" style={{ fontSize: 28 }}>{season.icon} {season.label}</h2>
             <p className="text-sm" style={{ color: "var(--muted)" }}>{season.desc}</p>
           </div>
-          <p className="text-xs" style={{ color: "var(--muted)" }}>{products.length} item — klik produk untuk tambah ke keranjang</p>
+          <p className="text-xs" style={{ color: "var(--muted)" }}>
+            {products.length} item
+            <span className="ml-2" style={{ color: "var(--accent2)" }}>
+              · {products.filter(p => SLUG_MAP[p.name]).length} punya halaman detail
+            </span>
+          </p>
         </div>
 
-        {/* Featured + grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Featured big */}
+        {/* Featured big + grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
             <ProductTile p={products[0]} bg={BG_LIST[0]} featured />
           </div>
-          {/* Rest */}
           <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4">
             {products.slice(1).map((p, i) => (
               <ProductTile key={p.name} p={p} bg={BG_LIST[(i + 1) % 6]} />

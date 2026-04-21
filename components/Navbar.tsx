@@ -9,6 +9,7 @@ import SearchModal from "./SearchModal";
 const NAV_LINKS = [
   { label: "Eksplorasi",   href: "/eksplorasi" },
   { label: "Koleksi",      href: "/koleksi" },
+  { label: "Pesanan",      href: "/pesanan" },
   { label: "Tentang Kami", href: "/tentang" },
   { label: "Blog",         href: "/blog" },
 ];
